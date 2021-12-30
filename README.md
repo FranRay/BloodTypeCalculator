@@ -1,2 +1,2 @@
 # BloodTypeCalculator
-Calculates your blood type!
+Calculate your blood type.
