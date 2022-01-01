@@ -13,9 +13,9 @@ export default function App() {
   var B = 0
   var AB = 0
 
-  //user input
-  var userInputMother = ' '
-  var userInputFather = ' '
+  const [userInputMother, setUserInputMother] = useState(' ');
+  const [userInputFather, setUserInputFather] = useState(' ');
+  const [forceRender, setForceRender] = useState(true);
 
   {/* Function: Display Results */}
   const displayResults = () => {
@@ -58,8 +58,9 @@ export default function App() {
     }
   }
 
+  {/* Function: Results Display */}
   const calculate = () => {
-    {/* Function: Results Display */}
+    setForceRender(!forceRender); // Changing this state forces the results to update
 
     if ((userInputMother == '') && (userInputFather == '')){
       alert("No Input has been selected.")
@@ -176,7 +177,7 @@ export default function App() {
           item={item}
           onPress={() => {
             setSelectedMotherId(item.id)
-            userInputMother = item.title;
+            setUserInputMother(item.title);
           }}
           backgroundColor={{ backgroundColor }}
           textColor={{ color }}
@@ -194,7 +195,7 @@ export default function App() {
           item={item}
           onPress={() => {
             setSelectedFatherId(item.id)
-            userInputFather = item.title;
+            setUserInputFather(item.title);
           }}
           backgroundColor={{ backgroundColor }}
           textColor={{ color }}
@@ -280,6 +281,7 @@ export default function App() {
                 renderItem={renderChildData}
                 keyExtractor={(item) => item.id}
                 horizontal={true}
+                extraData={forceRender} // Re-renders when this state is updated
               />
             </SafeAreaView>
           </View>
