@@ -1,18 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./style";
 import colors from './assets/colors/colors';
 import motherData from "./assets/data/motherData";
 import fatherData from "./assets/data/fatherData";
 import childData from "./assets/data/childData";
-import { Text, View, ImageBackground, TouchableOpacity, FlatList, SafeAreaView} from "react-native";
+import SplashScreen from 'react-native-splash-screen'
+import { Text, View, ImageBackground, TouchableOpacity, FlatList, SafeAreaView, Alert, Modal, Pressable} from "react-native";
 
 export default function App() {
+  SplashScreen.hide();
+
   //percentage
   var O = 0
   var A = 0
   var B = 0
   var AB = 0
 
+  const [modalVisible, setModalVisible] = useState(true);
   const [userInputMother, setUserInputMother] = useState(' ');
   const [userInputFather, setUserInputFather] = useState(' ');
   const [forceRender, setForceRender] = useState(true);
@@ -220,74 +224,103 @@ export default function App() {
     );
   };
 
-    return (
-      //UI Styling
-      <ImageBackground
-        source={require("./assets/bg.png")}
-        style={styles.backgroundImage}>
+  return (
+    //UI Styling
+    <ImageBackground
+      source={require("./assets/bg.png")}
+      style={styles.backgroundImage}>
 
-        {/* Header */}
-        <View style={styles.titleWrapper}>
-          <Text style={styles.title}>Hello!</Text>
-          <Text style={styles.subtitle}>Let's calculate your child's bloodtype.</Text>
+      {/* Modal */}
+      <View>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Blood Type Calculator</Text>
+              <View style={styles.modalLine}/>
+              
+              <Text style={styles.modalText}>
+                This is an app that can predict or calculate someone's blood type.
+                {'\n\n'}
+                To use it, simply click on the blood type that matches the Mother and Father's blood types, and press calculate.
+              </Text>
+
+              <Pressable
+                style={[styles.modalButton, styles.modalButtonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Continue</Text>
+              </Pressable>
+
+            </View>
+          </View>
+        </Modal>
+      </View>
+
+      {/* Header */}
+      <View style={styles.titleWrapper}>
+        <Text style={styles.title}>Hello!</Text>
+        <Text style={styles.subtitle}>Let's calculate your child's bloodtype.</Text>
+      </View>
+
+      {/* Mother Card */}
+      <View style={[styles.parentWrapper, styles.boxShadow]}>
+        <Text style={styles.parentTitle}>Mother</Text>
+        <View style={styles.typeListWrapper}>
+          <FlatList
+            data={motherData}
+            renderItem={renderMotherData}
+            keyExtractor={(item) => item.id}
+            extraData={selectedMotherId}
+            horizontal={true}
+          />
         </View>
+      </View>
 
-        {/* Mother Card */}
-        <View style={[styles.parentWrapper, styles.boxShadow]}>
-          <Text style={styles.parentTitle}>Mother</Text>
-          <View style={styles.typeListWrapper}>
+      {/* Father Card */}
+      <View style={[styles.parentWrapper, styles.boxShadow]}>
+        <Text style={styles.parentTitle}>Father</Text>
+        <View style={styles.typeListWrapper}>
+          <FlatList
+            data={fatherData}
+            renderItem={renderFatherData}
+            keyExtractor={(item) => item.id}
+            extraData={selectedFatherId}
+            horizontal={true}
+          />
+        </View>
+      </View>
+
+      {/* Calculate Button */}
+      <TouchableOpacity
+          style={styles.calculateButton}
+          onPress={calculate}>
+          <Text style={styles.calculateButtonText}>Calculate</Text>
+      </TouchableOpacity>
+
+      {/* Results */}
+      <View style={styles.resultsWrapper}>
+        <Text style={styles.resultsText}>Your child can have any of these possible bloodtypes:</Text>
+        <View style={styles.childTypeListWrapper}>
+          <SafeAreaView>
             <FlatList
-              data={motherData}
-              renderItem={renderMotherData}
+              data={childData}
+              renderItem={renderChildData}
               keyExtractor={(item) => item.id}
-              extraData={selectedMotherId}
               horizontal={true}
-              // keyboardDismissMode='on-drag'
-              // keyboardShouldPersistTaps={'handled'}
+              extraData={forceRender} // Re-renders when this state is updated
             />
-          </View>
+          </SafeAreaView>
         </View>
-
-        {/* Father Card */}
-        <View style={[styles.parentWrapper, styles.boxShadow]}>
-          <Text style={styles.parentTitle}>Father</Text>
-          <View style={styles.typeListWrapper}>
-            <FlatList
-              data={fatherData}
-              renderItem={renderFatherData}
-              keyExtractor={(item) => item.id}
-              extraData={selectedFatherId}
-              horizontal={true}
-              // keyboardDismissMode='on-drag'
-              // keyboardShouldPersistTaps={'handled'}
-            />
-          </View>
-        </View>
-
-        {/* Calculate Button */}
-        <TouchableOpacity
-            style={styles.calculateButton}
-            onPress={calculate}>
-            <Text style={styles.calculateButtonText}>Calculate</Text>
-        </TouchableOpacity>
-
-        {/* Results */}
-        <View style={styles.resultsWrapper}>
-          <Text style={styles.resultsText}>Your child can have any of these possible bloodtypes:</Text>
-          <View style={styles.childTypeListWrapper}>
-            <SafeAreaView>
-              <FlatList
-                data={childData}
-                renderItem={renderChildData}
-                keyExtractor={(item) => item.id}
-                horizontal={true}
-                extraData={forceRender} // Re-renders when this state is updated
-              />
-            </SafeAreaView>
-          </View>
-          {/* <Text>Father bloodtype: {userInputFather} Mother bloodtype: {userInputMother}</Text> */}
-        </View>
-      </ImageBackground>
+        {/* <Text>Father bloodtype: {userInputFather} Mother bloodtype: {userInputMother}</Text> */}
+      </View>
+    </ImageBackground>
   );
 }
 
